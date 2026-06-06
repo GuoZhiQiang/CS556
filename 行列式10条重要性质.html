@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行列式10条重要性质 | 3×3矩阵详解</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+            background: #f4f7fc;
+            color: #0a2540;
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0b2b44, #1a4a6f);
+            color: white;
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            opacity: 0.85;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .intro {
+            background: #eef2ff;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #3b82f6;
+        }
+
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .property-card {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .property-card:hover {
+            box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .property-header {
+            background: #f8fafc;
+            padding: 1rem 1.2rem;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .property-number {
+            background: #3b82f6;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .property-title {
+            color: #0f172a;
+        }
+
+        .property-body {
+            padding: 1.2rem;
+        }
+
+        .matrix-example {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Courier New', 'JetBrains Mono', monospace;
+            padding: 0.6rem 1rem;
+            border-radius: 0.8rem;
+            margin: 0.8rem 0;
+            overflow-x: auto;
+            white-space: pre;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .formula {
+            background: #f1f5f9;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            background: #e6f0ff;
+            color: #1e40af;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        footer {
+            background: #f1f5f9;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.75rem;
+            color: #475569;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 700px) {
+            .property-grid {
+                grid-template-columns: 1fr;
+            }
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📐 行列式的 10 条重要性质</h1>
+        <p>用 3×3 方阵直观解释 · 从几何到代数</p>
+    </header>
+    <div class="content">
+        <div class="intro">
+            <strong>🎯 行列式是什么？</strong> 一个将方阵映射为实数的函数，表示向量张成的“有向体积”。<br>
+            下面每一条性质都结合具体的 3×3 矩阵示例说明，帮助你建立直觉。
+        </div>
+
+        <div class="property-grid">
+            <!-- 1. 单位矩阵行列式为1 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">1</span>
+                    <span class="property-title">单位矩阵的行列式为 1</span>
+                </div>
+                <div class="property-body">
+                    <p>单位矩阵 \(I_3\) 是 3×3 方阵，对角线上为 1，其余为 0。</p>
+                    <div class="matrix-example">
+                        I₃ = ⎡1 0 0⎤
+                             ⎢0 1 0⎥
+                             ⎣0 0 1⎦
+                    </div>
+                    <div class="formula">
+                        det(I₃) = 1 × 1 × 1 = <strong>1</strong>
+                    </div>
+                    <p>几何意义：单位立方体的有向体积为 1。</p>
+                </div>
+            </div>
+
+            <!-- 2. 交换两行改变符号 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">2</span>
+                    <span class="property-title">交换两行改变符号</span>
+                </div>
+                <div class="property-body">
+                    <p>交换矩阵的任意两行，行列式变号。</p>
+                    <div class="matrix-example">
+                        A = ⎡1 0 0⎤   交换第1行和第3行 → B = ⎡0 0 1⎤
+                            ⎢0 1 0⎥                        ⎢0 1 0⎥
+                            ⎣0 0 1⎦                        ⎣1 0 0⎦
+                    </div>
+                    <div class="formula">
+                        det(A) = 1, det(B) = -1
+                    </div>
+                    <p>✍️ 几何原因：交换向量顺序 → 定向反转（右手系变左手系）。</p>
+                </div>
+            </div>
+
+            <!-- 3. 对每一行具有线性性质 (严格按照原始回答修改) -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">3</span>
+                    <span class="property-title">对每一行具有线性性质</span>
+                </div>
+                <div class="property-body">
+                    <p>行列式关于矩阵的每一行都是线性的，包含两个方面的含义：</p>
+                    <ul style="margin: 0.5rem 0 0.5rem 1.2rem;">
+                        <li><strong>数乘</strong>：若某一行所有元素乘以常数 \(k\)，则行列式也乘以 \(k\)。</li>
+                        <li><strong>可加性</strong>：若某一行可写成两个行向量之和，则行列式等于两个行列式之和（其余行不变）。</li>
+                    </ul>
+                    <div class="matrix-example">
+                        例1（数乘）：A = ⎡1 2 3⎤   将第一行乘以2 → B = ⎡2 4 6⎤
+                                   ⎢4 5 6⎥                     ⎢4 5 6⎥
+                                   ⎣7 8 9⎦                     ⎣7 8 9⎦
+                        det(B) = 2·det(A)
+                    </div>
+                    <div class="matrix-example">
+                        例2（可加性）：考虑 C = ⎡1+4 2+5 3+6⎤ = ⎡5 7 9⎤
+                                          ⎢4   5   6  ⎥   ⎢4 5 6⎥
+                                          ⎣7   8   9  ⎦   ⎣7 8 9⎦
+                        则 det(C) = det⎛⎡1 2 3⎤⎞ + det⎛⎡4 5 6⎤⎞
+                                      ⎝⎢4 5 6⎥⎠     ⎝⎢4 5 6⎥⎠
+                                      ⎣7 8 9⎦       ⎣7 8 9⎦
+                        右边第二个行列式因为两行相同而为0，左边第一个也为0，故det(C)=0。
+                    </div>
+                    <p>💡 线性性质是行列式公理化的核心之一，也是拉普拉斯展开的理论基础。</p>
+                </div>
+            </div>
+
+            <!-- 4. 两行相同则行列式为0 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">4</span>
+                    <span class="property-title">若两行相同，则行列式为 0</span>
+                </div>
+                <div class="property-body">
+                    <p>矩阵中有两行完全相同，则行列式为零。</p>
+                    <div class="matrix-example">
+                        A = ⎡1 2 3⎤
+                            ⎢1 2 3⎥   (第1行 = 第2行)
+                            ⎣4 5 6⎦
+                    </div>
+                    <div class="formula">
+                        计算：按第1行展开，或观察两行成比例 → det(A) = 0
+                    </div>
+                    <p>几何解释：两个向量相同 → 平行六面体坍缩 → 体积为零。</p>
+                </div>
+            </div>
+
+            <!-- 5. 一行倍数加到另一行，行列式不变 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">5</span>
+                    <span class="property-title">将一行的倍数加到另一行上，行列式不变</span>
+                </div>
+                <div class="property-body">
+                    <p>这是高斯消元的基础，不改变行列式的值。</p>
+                    <div class="matrix-example">
+                        A = ⎡1 0 0⎤   将第1行的2倍加到第2行 → B = ⎡1 0 0⎤
+                            ⎢0 1 0⎥                              ⎢2 1 0⎥
+                            ⎣0 0 1⎦                              ⎣0 0 1⎦
+                    </div>
+                    <div class="formula">
+                        det(A) = 1, det(B) = 1 × (1×1 - 0×0) = 1
+                    </div>
+                    <p>💡 体积不变，因为剪切变换不改变平行六面体的底面积和高。</p>
+                </div>
+            </div>
+
+            <!-- 6. 某行全为零 ⇒ 行列式为0 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">6</span>
+                    <span class="property-title">某行全为零 ⇒ 行列式为 0</span>
+                </div>
+                <div class="property-body">
+                    <p>如果矩阵有一行全部是零，则行列式为零。</p>
+                    <div class="matrix-example">
+                        A = ⎡1 2 3⎤
+                            ⎢0 0 0⎥   (第2行全零)
+                            ⎣4 5 6⎦
+                    </div>
+                    <div class="formula">
+                        按第二行展开，每一项都包含0因子 → det(A) = 0
+                    </div>
+                    <p>几何意义：一个向量为零 → 张成的体积为零。</p>
+                </div>
+            </div>
+
+            <!-- 7. 三角矩阵的行列式 = 对角线乘积 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">7</span>
+                    <span class="property-title">三角矩阵的行列式等于对角线元素乘积</span>
+                </div>
+                <div class="property-body">
+                    <p>上三角或下三角矩阵，行列式即主对角线上元素的乘积。</p>
+                    <div class="matrix-example">
+                        A = ⎡2 1 3⎤   (上三角)
+                            ⎢0 4 5⎥
+                            ⎣0 0 6⎦
+                    </div>
+                    <div class="formula">
+                        det(A) = 2 × 4 × 6 = <strong>48</strong>
+                    </div>
+                    <p>下三角同理。可直接从展开公式看出，非对角项在展开中消失。</p>
+                </div>
+            </div>
+
+            <!-- 8. 奇异矩阵 ⇔ det=0；可逆 ⇔ det≠0 -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">8</span>
+                    <span class="property-title">奇异矩阵 ⇔ det(A)=0；可逆 ⇔ det(A)≠0</span>
+                </div>
+                <div class="property-body">
+                    <p>矩阵不可逆（奇异）当且仅当行列式为0，反之可逆当且仅当行列式非零。</p>
+                    <div class="matrix-example">
+                        奇异矩阵例：A = ⎡1 2 3⎤  (第2行 = 2×第1行)
+                                    ⎢2 4 6⎥
+                                    ⎣7 8 9⎦
+                        det(A) = 0
+                    </div>
+                    <div class="matrix-example">
+                        可逆矩阵例：B = ⎡1 0 0⎤
+                                    ⎢0 2 0⎥
+                                    ⎣0 0 3⎦
+                        det(B) = 6 ≠ 0
+                    </div>
+                    <p>🌍 行列式为零 ↔ 体积零 ↔ 列向量线性相关 ↔ 矩阵奇异。</p>
+                </div>
+            </div>
+
+            <!-- 9. det(AB) = det(A)det(B) -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">9</span>
+                    <span class="property-title">det(AB) = det(A) · det(B)</span>
+                </div>
+                <div class="property-body">
+                    <p>矩阵乘积的行列式等于各自行列式的乘积。</p>
+                    <div class="matrix-example">
+                        A = ⎡1 0 0⎤, det=2        B = ⎡0 1 0⎤, det=-1
+                            ⎢0 2 0⎥                  ⎢1 0 0⎥
+                            ⎣0 0 1⎦                  ⎣0 0 1⎦
+                    </div>
+                    <div class="formula">
+                        AB = ⎡0 1 0⎤, det(AB) = -2 = 2 × (-1)
+                             ⎢2 0 0⎥
+                             ⎣0 0 1⎦
+                    </div>
+                    <p>几何含义：线性变换的体积缩放因子相乘。</p>
+                </div>
+            </div>
+
+            <!-- 10. det(A^T) = det(A) -->
+            <div class="property-card">
+                <div class="property-header">
+                    <span class="property-number">10</span>
+                    <span class="property-title">det(Aᵀ) = det(A)</span>
+                </div>
+                <div class="property-body">
+                    <p>矩阵转置不改变行列式的值。</p>
+                    <div class="matrix-example">
+                        A = ⎡1 2 3⎤        Aᵀ = ⎡1 4 7⎤
+                            ⎢4 5 6⎥             ⎢2 5 8⎥
+                            ⎣7 8 9⎦             ⎣3 6 9⎦
+                        det(A) = 0 ⇒ det(Aᵀ) = 0
+                    </div>
+                    <div class="formula">
+                        对可逆例：A = ⎡1 0 1⎤, det=4；转置后行列式仍为4。
+                                    ⎢0 2 0⎥
+                                    ⎣1 0 3⎦
+                    </div>
+                    <p>因为行和列在行列式定义中地位对称。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 额外小总结：从三维体积角度 -->
+        <div style="background: #f0f9ff; border-radius: 1rem; padding: 1rem; margin-top: 2rem;">
+            <span class="badge">📌 一句话总结</span>
+            <p>行列式是 <strong>有向体积</strong> 的函数：正负表示定向，绝对值表示体积大小。这10条性质共同刻画了体积在初等行变换下的行为，也是线性代数中判断可逆性、计算特征值乘积的核心工具。</p>
+        </div>
+
+        <footer>
+            🧠 提示：结合 3×3 矩阵实例反复演练这些性质，能让你真正理解行列式的几何与代数意义。
+        </footer>
+    </div>
+</div>
+</body>
+</html>
