@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线性代数：拉普拉斯展开与逆矩阵详解</title>
+    <!-- MathJax 核心渲染库，保证 LaTeX 公式显示 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Microsoft YaHei', sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 2rem 2rem 2.5rem;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-top: 1.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 3px solid #3b82f6;
+            display: inline-block;
+        }
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #0f172a;
+        }
+        .card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 1.2rem 1.8rem;
+            margin: 1.2rem 0;
+            border-left: 5px solid #3b82f6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .highlight {
+            background: #eef2ff;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            font-family: 'Courier New', 'Cascadia Code', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .matrix-text {
+            font-family: monospace;
+            font-size: 0.95rem;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            display: inline-block;
+            border: 1px solid #e2e8f0;
+        }
+        .formula {
+            font-family: 'Courier New', monospace;
+            background: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        code {
+            background: #eef2ff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .badge {
+            background: #3b82f6;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 999px;
+            padding: 0.2rem 0.8rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 1.5rem; }
+            .card { padding: 1rem; }
+        }
+        /* 确保 MathJax 输出的公式和文本间距合适 */
+        mjx-container {
+            margin: 0.2rem 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📐 拉普拉斯展开 &nbsp;|&nbsp; 逆矩阵全解</h1>
+    <p style="color: #475569; margin-bottom: 1.5rem;">行列式展开定理 + 高斯-约当消元法 / 伴随矩阵法（含完整3×3算例）</p>
+
+    <!-- ================= 第一部分：拉普拉斯展开 ================= -->
+    <h2>📌 一、拉普拉斯展开（余子式展开）</h2>
+    <p>拉普拉斯展开（Laplace expansion）将 <strong>n 阶行列式</strong> 的计算归结为若干个 <strong>n-1 阶行列式</strong> 的和，是行列式递归定义的核心。</p>
+
+    <div class="card">
+        <h3>🔹 基本定义</h3>
+        <p>设矩阵 \(A = (a_{ij})_{n \times n}\)，<br>
+        <strong>余子式 \(M_{ij}\)</strong>：删除第 \(i\) 行和第 \(j\) 列后得到的子矩阵的行列式。<br>
+        <strong>代数余子式 \(C_{ij}\)</strong>：\(C_{ij} = (-1)^{i+j} M_{ij}\)。</p>
+    </div>
+
+    <h3>📖 展开公式</h3>
+    <div class="highlight">
+        ✦ <strong>按第 \(i\) 行展开</strong>：\(\displaystyle \det(A) = \sum_{j=1}^{n} a_{ij} C_{ij} = \sum_{j=1}^{n} (-1)^{i+j} a_{ij} M_{ij}\)<br>
+        ✦ <strong>按第 \(j\) 列展开</strong>：\(\displaystyle \det(A) = \sum_{i=1}^{n} a_{ij} C_{ij} = \sum_{i=1}^{n} (-1)^{i+j} a_{ij} M_{ij}\)
+    </div>
+
+    <h3>📝 计算示例（3×3矩阵）</h3>
+    <p>矩阵 \(A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{pmatrix}\)，按第一行展开：</p>
+    <div class="highlight">
+        \(a_{11}=1,\; M_{11}=\begin{vmatrix}5&6\\8&9\end{vmatrix}=45-48=-3,\; C_{11}=(-1)^{2}(-3)=-3\)<br>
+        \(a_{12}=2,\; M_{12}=\begin{vmatrix}4&6\\7&9\end{vmatrix}=36-42=-6,\; C_{12}=(-1)^{3}(-6)=6\)<br>
+        \(a_{13}=3,\; M_{13}=\begin{vmatrix}4&5\\7&8\end{vmatrix}=32-35=-3,\; C_{13}=(-1)^{4}(-3)=-3\)<br>
+        \(\det(A)=1\times(-3)+2\times6+3\times(-3)=-3+12-9=0\) ✅
+    </div>
+
+    <div class="card">
+        <h3>💡 技巧与注意</h3>
+        <ul style="margin-left: 1.5rem;">
+            <li>选择 <strong>零元素最多</strong> 的行或列展开，大幅简化计算。</li>
+            <li>符号因子 \((-1)^{i+j}\) 切勿遗漏。</li>
+            <li>拉普拉斯展开理论复杂度 \(O(n!)\)，实际仅用于低阶 (\(n\le4\)) 或理论推导。</li>
+        </ul>
+    </div>
+
+    <!-- ================= 第二部分：逆矩阵 ================= -->
+    <h2>⚙️ 二、逆矩阵的两种经典算法</h2>
+    <p>对于方阵 \(A\)，若存在 \(B\) 使 \(AB=BA=I\)，则 \(B=A^{-1}\)。前提：\(\det(A) \neq 0\)。</p>
+
+    <!-- 2.1 高斯-约当消元法 -->
+    <h3>🔧 方法一：高斯-约当消元法 (Gauss-Jordan)</h3>
+    <div class="card">
+        <p><strong>步骤：</strong> 构造增广矩阵 \([A \mid I]\)，通过初等行变换将左侧 \(A\) 化为单位矩阵 \(I\)，此时右侧即为 \(A^{-1}\)。</p>
+        <p><strong>示例：</strong> \(A = \begin{pmatrix}2&1\\5&3\end{pmatrix}\)</p>
+        <div class="highlight">
+            \[
+            \left(\begin{array}{cc|cc}2&1&1&0\\5&3&0&1\end{array}\right)
+            \xrightarrow{\text{行变换}} 
+            \left(\begin{array}{cc|cc}1&0&3&-1\\0&1&-5&2\end{array}\right)
+            \quad\Rightarrow\quad A^{-1}=\begin{pmatrix}3&-1\\-5&2\end{pmatrix}
+            \]
+        </div>
+        <p>✅ <strong>优点：</strong> 稳定、通用，适合编程与手算（2~4阶）；无需预先行列式。</p>
+    </div>
+
+    <!-- 2.2 余子式法（伴随矩阵法）包含详细的3x3完整计算 -->
+    <h3>🧩 方法二：余子式法（伴随矩阵法）</h3>
+    <div class="card">
+        <p><strong>核心公式：</strong> \(\displaystyle A^{-1} = \frac{1}{\det(A)} \cdot \operatorname{adj}(A)\)，其中 \(\operatorname{adj}(A)\) 是代数余子式矩阵的<strong>转置</strong>。</p>
+        <ul>
+            <li><strong>余子式矩阵</strong>：\((M_{ij})\) 为各元素余子式</li>
+            <li><strong>代数余子式矩阵</strong>：\((C_{ij}) = ((-1)^{i+j} M_{ij})\)</li>
+            <li><strong>伴随矩阵</strong>：\(\operatorname{adj}(A) = (C_{ji}) = (C_{ij})^{\mathsf{T}}\)</li>
+        </ul>
+        <p style="margin-top: 0.5rem;"><strong>✧ 2×2 速记公式：</strong> \(\begin{pmatrix}a&b\\c&d\end{pmatrix}^{-1} = \frac{1}{ad-bc}\begin{pmatrix}d&-b\\-c&a\end{pmatrix}\)</p>
+    </div>
+
+    <h3>📐 完整3×3算例（余子式法）</h3>
+    <p>计算矩阵 \(A = \begin{pmatrix} 1 & 2 & 3 \\ 0 & 1 & 4 \\ 5 & 6 & 0 \end{pmatrix}\) 的逆矩阵。已知 \(\det(A)=1\) (验证见下)，因此 \(A^{-1} = \operatorname{adj}(A)\)。</p>
+    
+    <h4>🔢 第一步：计算行列式 \(\det(A)\)</h4>
+    <div class="highlight">
+        按第一行展开：<br>
+        \(\det(A)=1\cdot\begin{vmatrix}1&4\\6&0\end{vmatrix} -2\cdot\begin{vmatrix}0&4\\5&0\end{vmatrix} +3\cdot\begin{vmatrix}0&1\\5&6\end{vmatrix} = 1\cdot(0-24) -2\cdot(0-20) +3\cdot(0-5) = -24 +40 -15 = 1\)
+    </div>
+
+    <h4>🧮 第二步：计算所有代数余子式 \(C_{ij}\)</h4>
+    <div class="highlight" style="background:#fef9e3;">
+        \(C_{11}=(-1)^{1+1}M_{11}=+\begin{vmatrix}1&4\\6&0\end{vmatrix}= (1\cdot0-4\cdot6) = -24\)<br>
+        \(C_{12}=(-1)^{1+2}M_{12}=-\begin{vmatrix}0&4\\5&0\end{vmatrix}= - (0\cdot0-4\cdot5) = 20\)<br>
+        \(C_{13}=(-1)^{1+3}M_{13}=+\begin{vmatrix}0&1\\5&6\end{vmatrix}= (0\cdot6-1\cdot5) = -5\)<br><br>
+        \(C_{21}=(-1)^{2+1}M_{21}=-\begin{vmatrix}2&3\\6&0\end{vmatrix}= - (2\cdot0-3\cdot6) = 18\)<br>
+        \(C_{22}=(-1)^{2+2}M_{22}=+\begin{vmatrix}1&3\\5&0\end{vmatrix}= (1\cdot0-3\cdot5) = -15\)<br>
+        \(C_{23}=(-1)^{2+3}M_{23}=-\begin{vmatrix}1&2\\5&6\end{vmatrix}= -(1\cdot6-2\cdot5) = 4\)<br><br>
+        \(C_{31}=(-1)^{3+1}M_{31}=+\begin{vmatrix}2&3\\1&4\end{vmatrix}= (2\cdot4-3\cdot1) = 5\)<br>
+        \(C_{32}=(-1)^{3+2}M_{32}=-\begin{vmatrix}1&3\\0&4\end{vmatrix}= -(1\cdot4-3\cdot0) = -4\)<br>
+        \(C_{33}=(-1)^{3+3}M_{33}=+\begin{vmatrix}1&2\\0&1\end{vmatrix}= (1\cdot1-2\cdot0) = 1\)
+    </div>
+
+    <h4>📌 第三步：代数余子式矩阵 & 伴随矩阵</h4>
+    <div class="highlight">
+        代数余子式矩阵 \(\mathbf{C} = \begin{pmatrix} -24 & 20 & -5 \\ 18 & -15 & 4 \\ 5 & -4 & 1 \end{pmatrix}\)<br>
+        伴随矩阵（转置）\(\operatorname{adj}(A) = \mathbf{C}^{\mathsf{T}} = \begin{pmatrix} -24 & 18 & 5 \\ 20 & -15 & -4 \\ -5 & 4 & 1 \end{pmatrix}\)
+    </div>
+
+    <h4>✅ 第四步：逆矩阵结果</h4>
+    <div class="highlight" style="background:#e6f7e6; border-left-color:#10b981;">
+        \[
+        A^{-1} = \frac{1}{\det(A)} \operatorname{adj}(A) = 1 \cdot \begin{pmatrix} -24 & 18 & 5 \\ 20 & -15 & -4 \\ -5 & 4 & 1 \end{pmatrix}
+        = \boxed{\begin{pmatrix} -24 & 18 & 5 \\ 20 & -15 & -4 \\ -5 & 4 & 1 \end{pmatrix}}
+        \]
+    </div>
+    <p>🔍 <strong>验证</strong>（快速检验第一行第一列）：\(1·(-24)+2·20+3·(-5) = -24+40-15=1\)，其他位置同理可得单位矩阵，正确无误。</p>
+
+    <!-- 比较表格 -->
+    <h3>📊 方法对比与选择建议</h3>
+    <table>
+        <thead>
+            <tr><th>方法</th><th>适用阶数</th><th>手算友好度</th><th>编程效率</th><th>理论价值</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>高斯-约当消元法</td><td>任意 n (2~5 手算佳)</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>一般</td></tr>
+            <tr><td>余子式法（伴随矩阵）</td><td>n≤3 公式直接，n≥4 极繁琐</td><td>⭐⭐⭐ (2×2,3×3 熟练后很快)</td><td>⭐ (O(n!))</td><td>⭐⭐⭐⭐⭐ (克拉默法则基础)</td></tr>
+        </tbody>
+    </table>
+    <div class="card">
+        <p>💡 <strong>实用建议：</strong> 2×2 直接用记忆公式；3×3 若行列式简单可用伴随矩阵法，否则推荐高斯-约当；4×4 及以上优先使用消元法或软件（LU分解）。拉普拉斯展开则为余子式法提供了行列式与余子式的计算根基。</p>
+    </div>
+
+    <!-- ================= 第三部分：额外说明与关联 ================= -->
+    <h2>🔗 三、拉普拉斯展开与逆矩阵的内在联系</h2>
+    <p>计算伴随矩阵 \(\operatorname{adj}(A)\) 需要每个位置上的<strong>代数余子式</strong>，而每个代数余子式 \(C_{ij}\) 本质上是一个 \((n-1)\) 阶行列式，可通过<strong>拉普拉斯展开</strong>递归求出。因此，拉普拉斯展开不仅是行列式求值的利器，更是余子式法求逆矩阵的数学基石。</p>
+    <div class="highlight" style="background:#ede9fe; border-left-color:#8b5cf6;">
+        ✨ 克拉默法则：线性方程组 \(A\mathbf{x}=\mathbf{b}\) 的解为 \(x_i = \frac{\det(A_i)}{\det(A)}\)，其中 \(A_i\) 是 \(A\) 的第 \(i\) 列替换为 \(\mathbf{b}\)。该法则同样依赖于行列式与代数余子式的性质。
+    </div>
+
+    <!-- 小结 -->
+    <h2>📚 总结</h2>
+    <ul style="margin-bottom: 1rem; line-height: 1.6;">
+        <li>✅ 拉普拉斯展开能将高阶行列式降阶，是理论知识的核心。</li>
+        <li>✅ 高斯-约当消元法实用性强，适合手算与计算机。</li>
+        <li>✅ 余子式法（伴随矩阵）理论优美，小规模矩阵（2×2,3×3）可以直接使用。</li>
+        <li>✅ 熟悉代数余子式的符号规律 (\((-1)^{i+j}\)) 与转置过程，避免常见错误。</li>
+    </ul>
+
+    <footer>
+        🌟 整理自线性代数核心内容 · 拉普拉斯展开 + 逆矩阵详细推导与实例<br>
+        包含 3×3 矩阵完整计算（余子式法），可直接套用于相似题型。数学公式由 MathJax 渲染，支持所有 LaTeX 表达式。
+    </footer>
+</div>
+</body>
+</html>
